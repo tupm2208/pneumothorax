@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 import albumentations as albu
 from albumentations.pytorch.transforms import ToTensor
 
-transform_path = "/home/tupm/HDD/projects/FCN_python/pneumothorax-segmentation/unet_pipeline/transforms/valid_transforms_1024_old.json"
+transform_path = "valid_transforms_1024_old.json"
 transform = albu.load(transform_path) 
 
 class SIIMDataset(Dataset):
