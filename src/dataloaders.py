@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 import albumentations as albu
 from albumentations.pytorch.transforms import ToTensor
 
-transform_path = "valid_transforms_1024_old.json"
+transform_path = "../configures/valid_transforms_1024_old.json"
 transform = albu.load(transform_path) 
 
 class SIIMDataset(Dataset):
@@ -20,8 +20,6 @@ class SIIMDataset(Dataset):
         self.image_name_list = df[df['exist_labels'] == 1]['fname'].to_list()[:20]
         self.img_size = img_size
 
-        
-        print("number of sample: ", self.__len__())
         print("number of sample: ", self.__len__())
 
     def __getitem__(self, idx):
@@ -37,19 +35,12 @@ class SIIMDataset(Dataset):
         image = cv2.resize(image, (size, size))
         mask = cv2.resize(mask, (size, size))
 
-        # mask = np.where(cv2.imread(mask_path, 0) > 0, 1, 0).astype(np.float32)
         sample = {"image": image, "mask": mask}
         sample = transform(**sample)
         sample = self.to_tensor(**sample)
         image = sample['image']
         mask = sample['mask']
         
-        # size = 1024
-        
-        
-        # image = (np.reshape(image, (3, size, size)) - 127)/255.0
-        # mask  = np.reshape(mask, (1, size, size))
-
         return image, mask
 
     def __len__(self):
