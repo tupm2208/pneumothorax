@@ -8,8 +8,8 @@
                 "__class_fullname__": "albumentations.augmentations.transforms.Resize",
                 "always_apply": true,
                 "p": 1,
-                "height": 1024,
-                "width": 1024,
+                "height": 512,
+                "width": 512,
                 "interpolation": 1
             }
         ],

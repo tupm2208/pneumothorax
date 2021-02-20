@@ -13,35 +13,36 @@ import cv2
 
 device = torch.device('cuda:0')
 model = AlbuNet().to(device)
-# checkpoint_path = "checkpoints/albunet_1024_fold0.pth"
-# model.load_state_dict(torch.load(checkpoint_path))
+checkpoint_path = "../checkpoints/seg-9.pth"
+model.load_state_dict(torch.load(checkpoint_path))
 
 
 trainloader = DataLoader(
-    SIIMDataset("dataset"),
-    batch_size=1,
-    num_workers=2,
+    SIIMDataset("../dataset"),
+    batch_size=4,
+    num_workers=4,
     pin_memory=True,
     shuffle=True,
 )
 
-optimizer = optim.Adam(model.parameters(), lr=5e-2)
+optimizer = optim.Adam(model.parameters(), lr=0.00001)
 criterion = ComboLoss({
     'bce': 3,
     'dice': 1,
     'focal': 4
 })
 
-for idx, batch in enumerate(trainloader):
-    images, masks = batch
-    images = images.to(device).type(torch.float32)
-    out = model(images)
-    out = torch.sigmoid(out) 
-    ms = np.reshape(out.cpu().detach().numpy(), (1024, 1024))
-    ms = np.where(ms > 0.5, 1, 0).astype(np.float32)
-    cv2.imshow("", ms)
-    cv2.imshow("original", np.reshape(masks.detach().numpy(), (1024, 1024)))
-    cv2.waitKey(0)
+# for idx, batch in enumerate(trainloader):
+#     images, masks = batch
+#     images = images.to(device).type(torch.float32)
+#     out = model(images)
+#     out = torch.sigmoid(out) 
+#     print(images.shape, out.shape)
+#     ms = np.reshape(out.cpu().detach().numpy(), (512, 512))
+#     ms = np.where(ms > 0.3, 1, 0).astype(np.float32)
+#     cv2.imshow("", ms)
+#     cv2.imshow("original", np.reshape(masks.detach().numpy(), (512, 512)))
+#     cv2.waitKey(0)
 
 num_epochs = 10
 grad_accum = 1
@@ -73,3 +74,5 @@ for epoch in range(num_epochs):
             dices.append(1-soft_dice_loss(outputs, targets))
             print(dices)
             print(f"epoch: {epoch+1} |step: {itr} | loss: {loss.item()} | dice score: {max(dices)}")
+    
+    torch.save(model.state_dict(), f'../checkpoints/seg-{epoch}.pth')

@@ -6,18 +6,16 @@ from torch.utils.data import Dataset
 import albumentations as albu
 from albumentations.pytorch.transforms import ToTensor
 
-transform_path = "../configures/valid_transforms_1024_old.json"
+transform_path = "../configures/train_transforms_complex_512.json"
 transform = albu.load(transform_path) 
 
 class SIIMDataset(Dataset):
-    def __init__(self, folder, img_size=1024):
-        # self.image_name_list = os.listdir(f'{folder}/images')
-        # self.image_name_list = os.listdir(f'{folder}/train')
+    def __init__(self, folder, img_size=512):
         self.root = folder
         self.to_tensor = ToTensor()
 
-        df = pd.read_csv('train_folds_5.csv')
-        self.image_name_list = df[df['exist_labels'] == 1]['fname'].to_list()[:20]
+        df = pd.read_csv('../dataset/train_folds_5.csv')
+        self.image_name_list = df[df['exist_labels'] == 1]['fname'].to_list()
         self.img_size = img_size
 
         print("number of sample: ", self.__len__())
@@ -28,7 +26,7 @@ class SIIMDataset(Dataset):
         size = self.img_size
         
         image_path = os.path.join(self.root, 'train' ,image_id)
-        mask_path = os.path.join(self.root, 'mask' ,image_id)
+        mask_path = os.path.join(self.root, 'mask2' ,image_id)
         image = cv2.imread(image_path)
         mask = cv2.imread(mask_path, 0)
 
